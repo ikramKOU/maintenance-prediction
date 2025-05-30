@@ -118,7 +118,7 @@ public class Alerte {
     }
 
     // Méthode setAnomalie à implémenter plus tard si nécessaire
-    public void setAnomalie(Anomalie anomalie) {
-        throw new UnsupportedOperationException("Unimplemented method 'setAnomalie'");
-    }
+   public void setAnomalie(Anomalie anomalie) {
+    this.anomalie = anomalie;
+}
 }

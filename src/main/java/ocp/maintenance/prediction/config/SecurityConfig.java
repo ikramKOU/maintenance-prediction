@@ -51,7 +51,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
-                .requestMatchers( "/api/equipements/**","/api/employees/**").hasRole("ADMINISTRATEUR")
+                .requestMatchers( "/api/equipements/**","/api/employees/**","/api/capteurs/**","/api/interventions/**").hasRole("ADMINISTRATEUR")
                 .anyRequest().authenticated()
             )
             .oauth2ResourceServer(oauth2 -> oauth2

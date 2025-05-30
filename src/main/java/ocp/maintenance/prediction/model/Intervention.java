@@ -9,6 +9,8 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -26,6 +28,10 @@ public class Intervention {
     private LocalDateTime dateDebut;
     private LocalDateTime dateFin;
 
+    
+    @Enumerated(EnumType.STRING)
+    private StatutIntervention statut;
+
     @Column(columnDefinition = "TEXT")
     private String details;
 
@@ -36,6 +42,15 @@ public class Intervention {
     @ManyToOne
     @JoinColumn(name = "equipement_id")
     private Equipement equipement;
+
+
+    public StatutIntervention getStatut() {
+    return statut;
+    }
+
+    public void setStatut(StatutIntervention statut) {
+        this.statut = statut;
+    }
 
     public Long getId() {
         return id;
