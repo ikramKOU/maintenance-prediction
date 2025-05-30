@@ -36,6 +36,8 @@ public class Alerte {
     @ManyToOne
     @JoinColumn(name = "capteur_id")
     private Capteur capteur;
+
+
     @ManyToOne
     @JoinColumn(name = "anomalie_id")
     private Anomalie anomalie;
