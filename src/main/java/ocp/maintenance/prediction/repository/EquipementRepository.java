@@ -13,4 +13,6 @@ import ocp.maintenance.prediction.model.EtatEquipement;
 public interface EquipementRepository extends JpaRepository<Equipement, Long> {
     List<Equipement> findByEtat(EtatEquipement etat);
     Optional<Equipement> findByType(String type);  
+    Optional<Equipement> findByName(String name);
+
 }

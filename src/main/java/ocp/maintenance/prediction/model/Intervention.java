@@ -16,6 +16,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 
 @Entity
@@ -24,9 +27,18 @@ public class Intervention {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
+    @ManyToOne
+    @JoinColumn(name = "alerte_id")
+    private Alerte alerte;
+    
+  
 
-    private LocalDateTime dateDebut;
-    private LocalDateTime dateFin;
+    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
+private LocalDateTime dateDebut;
+
+@JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
+private LocalDateTime dateFin;
 
     
     @Enumerated(EnumType.STRING)
@@ -41,6 +53,7 @@ public class Intervention {
 
     @ManyToOne
     @JoinColumn(name = "equipement_id")
+    @JsonManagedReference
     private Equipement equipement;
 
 
@@ -98,6 +111,14 @@ public class Intervention {
 
     public void setEquipement(Equipement equipement) {
         this.equipement = equipement;
+    }
+
+    public Alerte getAlerte() {
+        return alerte;
+    }
+
+    public void setAlerte(Alerte alerte) {
+        this.alerte = alerte;
     }
 
 }

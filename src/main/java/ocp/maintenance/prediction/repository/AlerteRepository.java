@@ -1,5 +1,6 @@
 package ocp.maintenance.prediction.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,4 +15,7 @@ public interface AlerteRepository extends JpaRepository<Alerte, Long> {
     List<Alerte> findByStatut(StatutAlerte statut);
     List<Alerte> findByEquipementId(Long equipementId);
     List<Alerte> findByEmployeId(Long employeId);
+
+boolean existsByMessageAndDateCreationBetween(String message, LocalDateTime start, LocalDateTime end);
+
 }

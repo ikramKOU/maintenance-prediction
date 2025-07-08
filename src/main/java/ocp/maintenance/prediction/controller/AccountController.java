@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -78,6 +79,25 @@ public class AccountController {
 
         return ResponseEntity.ok(Collections.singletonMap("token", token));
     }
+// @PostMapping("/login")
+// public ResponseEntity<?> login(@RequestBody LoginDto loginDto) {
+//     Optional<Employee> optionalEmployee = employeRepository.findByUsername(loginDto.getUsername());
+
+//     if (optionalEmployee.isEmpty() || !passwordEncoder.matches(loginDto.getPassword(), optionalEmployee.get().getPassword())) {
+//         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+//                 .body(Collections.singletonMap("error", "Invalid username or password"));
+//     }
+
+//     Employee employee = optionalEmployee.get();
+//     String token = createJwtToken(employee);
+
+//     if (token == null) {
+//         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                 .body(Collections.singletonMap("error", "Token generation failed"));
+//     }
+
+//     return ResponseEntity.ok(Collections.singletonMap("token", token));
+// }
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody Employee employee) {

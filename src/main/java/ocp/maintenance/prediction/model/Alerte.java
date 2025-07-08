@@ -7,7 +7,10 @@ package ocp.maintenance.prediction.model;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -21,7 +24,7 @@ public class Alerte {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+@Column(columnDefinition = "TEXT")
     private String message;
     private String typeAnomalie;
 
@@ -44,6 +47,24 @@ public class Alerte {
     private LocalDateTime  dateCreation;
 
 
+   
+
+    @ManyToOne
+    @JoinColumn(name = "lu_par_id")
+    private Employee luPar;
+
+    // Getter/Setter
+    public Employee getLuPar() {
+        return luPar;
+    }
+
+    public void setLuPar(Employee luPar) {
+        this.luPar = luPar;
+    }
+
+  
+
+
        public LocalDateTime getDateCreation() {
         return dateCreation;
     }
@@ -56,7 +77,19 @@ public class Alerte {
     public Anomalie getAnomalie() {
         return anomalie;
     }
+    private boolean lue = false;
 
+// Getter
+public boolean isLue() {
+    return lue;
+}
+
+// Setter
+public void setLue(boolean lue) {
+    this.lue = lue;
+}
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private StatutAlerte statut;
 
 

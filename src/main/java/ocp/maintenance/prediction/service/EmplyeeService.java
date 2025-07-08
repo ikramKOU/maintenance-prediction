@@ -16,6 +16,12 @@ public class EmplyeeService {
     @Autowired
     private EmployeRepository employeRepository;
 
+
+
+    public Employee findByUsername(String username) {
+        return employeRepository.findByUsername(username);
+    }
+
     public List<Employee> getAllEmployees() {
         return employeRepository.findAll();
     }
@@ -23,6 +29,8 @@ public class EmplyeeService {
     public Optional<Employee> getEmployeeById(Long id) {
         return employeRepository.findById(id);
     }
+
+    
 
     public Employee updateEmployee(Long id, Employee newData) {
         return employeRepository.findById(id).map(emp -> {
@@ -37,6 +45,10 @@ public class EmplyeeService {
 
     public void deleteEmployee(Long id) {
         employeRepository.deleteById(id);
+    }
+
+    public Object findById(Long employe) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
     
 }

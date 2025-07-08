@@ -7,6 +7,8 @@ package ocp.maintenance.prediction.model;
 
 import java.time.Instant;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,9 +27,10 @@ public class Capteur {
     private Double valeur;
     private Instant timestamp;
 
-    @ManyToOne
-    @JoinColumn(name = "equipement_id")
-    private Equipement equipement;
+   @ManyToOne
+@JoinColumn(name = "equipement_id")
+@JsonIgnore
+private Equipement equipement;
 
     // Getters
     public Long getId() {
