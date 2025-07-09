@@ -19,7 +19,7 @@ package ocp.maintenance.prediction.config;
 //         config.enableSimpleBroker("/topic"); // chemin des notifs
 //         config.setApplicationDestinationPrefixes("/app"); // préfixe pour envoi client → serveur
 //     }
-// }
+
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -41,3 +41,4 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/ws").setAllowedOriginPatterns("*").withSockJS();
     }
 }
+//  hada khadam}

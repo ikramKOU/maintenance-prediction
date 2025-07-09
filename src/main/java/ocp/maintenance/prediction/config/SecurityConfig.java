@@ -59,6 +59,8 @@ public class SecurityConfig {
             .cors(withDefaults())
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/ws-sensor-data/**","/topic/**","/ws/**", "/ws/info").permitAll()  // ⚠️ Doit être en premier
+
                 .requestMatchers("/ws/**","/ws/info","/api/auth/register", "/api/auth/login","/api/interventions/**").permitAll()
                 .requestMatchers( "/api/equipements/**","/api/employees/**","/api/capteurs/**").hasRole("ADMINISTRATEUR")
                 .anyRequest().authenticated()
