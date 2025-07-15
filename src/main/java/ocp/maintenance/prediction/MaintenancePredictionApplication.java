@@ -3,11 +3,11 @@ package ocp.maintenance.prediction;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"ocp.maintenance", "ocp.maintenance.prediction"})
 public class MaintenancePredictionApplication {
     public static void main(String[] args) {
         SpringApplication.run(MaintenancePredictionApplication.class, args);
-        		System.out.println("Application is running on port: " + System.getProperty("server.port", "8080"));
-
+        System.out.println("Application is running on port: " + System.getProperty("server.port", "8080"));
     }
 }
+

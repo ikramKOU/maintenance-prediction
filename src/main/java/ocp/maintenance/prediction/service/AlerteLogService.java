@@ -1,20 +1,20 @@
 package ocp.maintenance.prediction.service;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.util.Optional;
+// import java.io.BufferedReader;
+// import java.io.IOException;
+// import java.nio.file.Files;
+// import java.nio.file.Paths;
+// import java.time.LocalDateTime;
+// import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.stereotype.Service;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.transaction.Transactional;
-import ocp.maintenance.prediction.model.Alerte;
-import ocp.maintenance.prediction.model.StatutAlerte;
-import ocp.maintenance.prediction.repository.AlerteRepository;
+// import jakarta.annotation.PostConstruct;
+// import jakarta.transaction.Transactional;
+// import ocp.maintenance.prediction.model.Alerte;
+// import ocp.maintenance.prediction.model.StatutAlerte;
+// import ocp.maintenance.prediction.repository.AlerteRepository;
 
 // import java.io.BufferedReader;
 // import java.nio.file.Files;
@@ -218,7 +218,23 @@ import ocp.maintenance.prediction.repository.AlerteRepository;
 //     }
 // }
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import jakarta.annotation.PostConstruct;
+import jakarta.transaction.Transactional;
+
+import ocp.maintenance.prediction.model.Alerte;
+import ocp.maintenance.prediction.model.StatutAlerte;
+import ocp.maintenance.prediction.repository.AlerteRepository;
+import ocp.maintenance.prediction.service.PredictionService;
 @Service
 public class AlerteLogService {
 
@@ -227,6 +243,9 @@ public class AlerteLogService {
 
     @Autowired
     private WebSocketNotifier notifier;
+
+    @Autowired
+    private PredictionService predictionService;
 
     private static final String FILE_PATH = "C:\\Users\\ikram\\OneDrive\\Documents\\kafka-simulation\\alerts\\alerts.log";
 
@@ -262,9 +281,6 @@ public class AlerteLogService {
         }
     }
 
-    /**
-     * Convertit une ligne brute du fichier log en objet Alerte
-     */
     public Alerte parserLigneEnAlerte(String ligne) {
         try {
             String[] parts = ligne.split(" - ");
@@ -286,10 +302,12 @@ public class AlerteLogService {
             alerte.setMessage(message);
             alerte.setTypeAnomalie("Anomalie #" + idAnomalieStr);
             alerte.setStatut(StatutAlerte.OUVERTE);
+             LocalDateTime predictedTime = dateCreation.plusMinutes(11);
+              alerte.setPredictedTime(predictedTime);
+            predictionService.enregistrerPrediction(predictedTime, 1, message);
+            alerte.setPredictedTime(predictedTime);
+            alerteRepository.save(alerte);
 
-            // Pour l'instant, on ne lie pas l'alerte à une anomalie spécifique.
-            // Quand ton modèle permettra d'extraire des anomalies distinctes,
-            // tu pourras ici créer et associer une anomalie.
 
             return alerte;
         } catch (Exception e) {
@@ -299,9 +317,6 @@ public class AlerteLogService {
         }
     }
 
-    /**
-     * Sauvegarde une alerte si elle n'est pas déjà enregistrée aujourd’hui pour le même message
-     */
     public void saveIfNotDuplicateToday(Alerte alerte) {
         LocalDateTime creationDate = alerte.getDateCreation();
         LocalDateTime startOfDay = creationDate.toLocalDate().atStartOfDay();

@@ -146,6 +146,9 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import ocp.maintenance.prediction.model.Alerte;
 import ocp.maintenance.prediction.model.StatutAlerte;
 import ocp.maintenance.prediction.repository.AlerteRepository;
@@ -181,29 +184,57 @@ public class AlerteKafkaConsumer {
         this.webSocketNotifier = webSocketNotifier;
     }
 
-    @KafkaListener(
-        topics = "alertes-data",
-        groupId = "alerte-group",
-        properties = {
-            "auto.offset.reset=earliest"
-        }
-    )
-    public void listen(String message) {
-        if (message == null || !message.contains("Anomalie") || !message.contains("Prévue pour")) {
-            return;
+    // @KafkaListener(
+    //     topics = "alertes-data",
+    //     groupId = "alerte-group",
+    //     properties = {
+    //         "auto.offset.reset=earliest"
+    //     }
+    // )
+    // public void listen(String message) {
+    //     if (message == null || !message.contains("Anomalie") || !message.contains("Prévue pour")) {
+    //         return;
+    //     }
+
+    //     Alerte alerte = parseMessageToAlerte(message);
+
+    //     if (alerte != null) {
+    //         bufferAlertes.add(alerte);
+
+    //         // Démarrer le timer s’il n’est pas déjà en cours
+    //         if (currentTimer == null || currentTimer.isDone()) {
+    //             currentTimer = scheduler.schedule(this::flushBuffer, BATCH_WINDOW_MS, TimeUnit.MILLISECONDS);
+    //         }
+    //     }
+    // }
+@KafkaListener(topics = "alertes-data", groupId = "alerte-group")
+public void listen(String messageJson) {
+    try {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode node = mapper.readTree(messageJson);
+
+        int prediction = node.get("prediction").asInt();
+        if (prediction != 0) {
+            return; // Ne pas enregistrer si c’est normal
         }
 
-        Alerte alerte = parseMessageToAlerte(message);
+        String message = node.get("message").asText();
+        String predictedTime = node.get("predictedTime").asText();
 
-        if (alerte != null) {
-            bufferAlertes.add(alerte);
+        Alerte alerte = new Alerte();
+        alerte.setDateCreation(LocalDateTime.now());
+        alerte.setMessage(message);
+        alerte.setStatut(StatutAlerte.OUVERTE);
+        alerte.setTypeAnomalie("Anomalie"); // Tu peux extraire depuis le message aussi
 
-            // Démarrer le timer s’il n’est pas déjà en cours
-            if (currentTimer == null || currentTimer.isDone()) {
-                currentTimer = scheduler.schedule(this::flushBuffer, BATCH_WINDOW_MS, TimeUnit.MILLISECONDS);
-            }
-        }
+        alerteRepository.save(alerte);
+        webSocketNotifier.notifyNewAlerte(alerte);
+        System.out.println("✅ Alerte enregistrée : " + message);
+
+    } catch (Exception e) {
+        System.err.println("❌ Erreur Kafka : " + e.getMessage());
     }
+}
 
     /**
      * Méthode appelée quand la fenêtre temporelle se termine

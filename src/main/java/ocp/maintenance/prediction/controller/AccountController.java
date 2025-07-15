@@ -16,6 +16,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -23,6 +25,7 @@ import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 
+import ocp.maintenance.prediction.config.TokenBlacklistService;
 import ocp.maintenance.prediction.dto.LoginDto;
 import ocp.maintenance.prediction.model.Employee;
 import ocp.maintenance.prediction.repository.EmployeRepository;
@@ -48,6 +51,22 @@ public class AccountController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+       private final TokenBlacklistService tokenBlacklistService;
+
+    // Modifiez le constructeur pour inclure TokenBlacklistService
+    @Autowired
+    public AccountController(AuthenticationManager authenticationManager,
+                           EmployeRepository employeRepository,
+                           PasswordEncoder passwordEncoder,
+                           JwtEncoder jwtEncoder,
+                           TokenBlacklistService tokenBlacklistService) {
+        this.authenticationManager = authenticationManager;
+        this.employeRepository = employeRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtEncoder = jwtEncoder;
+        this.tokenBlacklistService = tokenBlacklistService;
+    }
 
     @GetMapping("/profil")
     public ResponseEntity<?> profile(Authentication auth) {
@@ -78,6 +97,24 @@ public class AccountController {
         }
 
         return ResponseEntity.ok(Collections.singletonMap("token", token));
+    }
+
+     @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            
+            // Ajoute le token à la blacklist
+            tokenBlacklistService.addToBlacklist(token);
+            
+            // Réponse avec en-tête de nettoyage client
+            return ResponseEntity.ok()
+                .header("Clear-Site-Data", "\"cache\", \"cookies\", \"storage\"")
+                .body(Collections.singletonMap("message", "Déconnexion réussie"));
+        }
+        return ResponseEntity.badRequest()
+            .body(Collections.singletonMap("error", "Token manquant ou mal formaté"));
     }
 // @PostMapping("/login")
 // public ResponseEntity<?> login(@RequestBody LoginDto loginDto) {
